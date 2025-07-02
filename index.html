@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FormulApp - Joel Test & CMMI Data Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            padding: 60px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide h1 {
+            font-size: 3.5em;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide h2 {
+            font-size: 2.5em;
+            color: #34495e;
+            margin-bottom: 40px;
+            text-align: center;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .slide h3 {
+            font-size: 1.8em;
+            color: #2980b9;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            width: 100%;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .joel-score {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .score-big {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .joel-breakdown {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .joel-breakdown h3 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.6em;
+        }
+
+        .joel-items {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .joel-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            font-size: 0.95em;
+        }
+
+        .joel-item .status {
+            font-size: 1.2em;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+
+        .joel-item.yes { border-left: 4px solid #27ae60; }
+        .joel-item.no { border-left: 4px solid #e74c3c; }
+        .joel-item.partial { border-left: 4px solid #f39c12; }
+
+        .joel-item.yes .status { color: #27ae60; }
+        .joel-item.no .status { color: #e74c3c; }
+        .joel-item.partial .status { color: #f39c12; }
+
+        .strengths, .weaknesses {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .strengths {
+            border-left: 5px solid #28a745;
+        }
+
+        .weaknesses {
+            border-left: 5px solid #dc3545;
+        }
+
+        .strengths h3 {
+            color: #28a745;
+        }
+
+        .weaknesses h3 {
+            color: #dc3545;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            position: relative;
+            padding-left: 45px;
+        }
+
+        .strengths li::before {
+            content: "✓";
+            position: absolute;
+            left: 15px;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        .weaknesses li::before {
+            content: "✗";
+            position: absolute;
+            left: 15px;
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        .cmmi-level {
+            text-align: center;
+            background: linear-gradient(135deg, #fd7e14, #e83e8c);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .level-text {
+            font-size: 2.8em;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .project-info {
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 25px 0;
+            justify-content: center;
+        }
+
+        .tech-item {
+            background: #667eea;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.95em;
+            font-weight: 500;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .app-screenshot {
+            max-height: 80vh;
+            width: auto;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .title-layout {
+            display: grid;
+            grid-template-columns: 66.66% 33.33%;
+            gap: 40px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .title-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center; 
+            text-align: center;
+            height: 100%;
+        }
+
+        .screenshot-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .recommendations {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #ffc107;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .recommendations h3 {
+            color: #856404;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px;
+            }
+            
+            .slide h1 { font-size: 2.5em; }
+            .slide h2 { font-size: 1.8em; }
+            
+            .two-column {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .joel-items {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-big {
+                font-size: 3em;
+            }
+            
+            .app-screenshot {
+                max-height: 60vh;
+                width: auto;
+                margin-bottom: 20px;
+            }
+
+            .title-layout {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                text-align: center;
+            }
+
+            .screenshot-container {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Slide 1: Título -->
+        <div class="slide active">
+            <div class="content">
+                <div class="title-layout">
+                    <div class="title-content">
+                        <h1>FormulApp</h1>
+                        <div class="project-info">
+                            <h2>Joel Test & CMMI Data Management</h2>
+                            <p style="text-align: center; font-size: 1.3em; margin: 25px 0; color: #2c3e50;">
+                                Evaluación de Metodologías y Gestión de Datos
+                            </p>
+                            <div class="tech-stack">
+                                <span class="tech-item">React Native</span>
+                                <span class="tech-item">Expo</span>
+                                <span class="tech-item">SQLite</span>
+                                <span class="tech-item">UI-Kitten</span>
+                                <span class="tech-item">Git</span>
+                                <span class="tech-item">Jira</span>
+                            </div>
+                        </div>
+                        <p style="text-align: center; font-size: 1.2em; color: #666; margin-top: 40px;">
+                            Presentado por: Patricio Lobos y Benjamín Parra<br>
+                            <em>Scrum Masters del Proyecto</em>
+                        </p>
+                    </div>
+                    <div class="screenshot-container">
+                        <img src="Formulapp.png" alt="FormulApp Screenshot" class="app-screenshot">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Contexto del Proyecto -->
+        <div class="slide">
+            <div class="content">
+                <h2>Contexto del Proyecto</h2>
+                <div class="project-info">
+                    <h3>📱 FormulApp</h3>
+                    <p><strong>Objetivo:</strong> Aplicación móvil para crear y rellenar formularios</p>
+                </div>
+                
+                <div class="two-column">
+                    <div>
+                        <h3>👥 Equipo</h3>
+                        <ul>
+                            <li><strong>6 personas</strong> en total</li>
+                            <li><strong>2 subequipos</strong> para mayor eficiencia</li>
+                            <li><strong>2 Scrum Masters</strong> (nosotros)</li>
+                            <li>Roles mixtos: <em>Scrum Master + Desarrollador</em></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3>⚙️ Tecnologías</h3>
+                        <ul>
+                            <li><strong>Frontend:</strong> React Native + Expo</li>
+                            <li><strong>UI:</strong> UI-Kitten</li>
+                            <li><strong>Base de Datos:</strong> SQLite local</li>
+                            <li><strong>Control de Versiones:</strong> Git</li>
+                            <li><strong>Gestión:</strong> Jira (implementado tarde)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Joel Test - Puntuación -->
+        <div class="slide">
+            <div class="content">
+                <h2>Joel Test - Resultados</h2>
+                <div class="joel-score">
+                    <h3>Puntuación Obtenida</h3>
+                    <div class="score-big">6.5/12</div>
+                    <p>Nivel intermedio con áreas de mejora significativas</p>
+                </div>
+                
+                <div class="joel-breakdown">
+                    <h3>📊 Desglose Detallado del Joel Test</h3>
+                    <div class="joel-items">
+                        <div class="joel-item yes">
+                            <span class="status">✅</span>
+                            <span>Control de versiones (Git)</span>
+                        </div>
+                        <div class="joel-item yes">
+                            <span class="status">✅</span>
+                            <span>Build en un paso (EAS)</span>
+                        </div>
+                        <div class="joel-item no">
+                            <span class="status">❌</span>
+                            <span>Builds diarios (solo al final de sprint)</span>
+                        </div>
+                        <div class="joel-item no">
+                            <span class="status">❌</span>
+                            <span>Base de datos bugs (Jira tardío)</span>
+                        </div>
+                        <div class="joel-item yes">
+                            <span class="status">✅</span>
+                            <span>Arreglan bugs primero</span>
+                        </div>
+                        <div class="joel-item yes">
+                            <span class="status">✅</span>
+                            <span>Cronograma actualizado</span>
+                        </div>
+                        <div class="joel-item yes">
+                            <span class="status">✅</span>
+                            <span>Especificaciones (manual + JavaDoc)</span>
+                        </div>
+                        <div class="joel-item partial">
+                            <span class="status">⚠️</span>
+                            <span>Condiciones trabajo (0.5 - universidad ruidosa)</span>
+                        </div>
+                        <div class="joel-item yes">
+                            <span class="status">✅</span>
+                            <span>Mejores herramientas (GitHub Student PRO)</span>
+                        </div>
+                        <div class="joel-item no">
+                            <span class="status">❌</span>
+                            <span>Testers dedicados</span>
+                        </div>
+                        <div class="joel-item no">
+                            <span class="status">❌</span>
+                            <span>No aplica (equipo estático)</span>
+                        </div>
+                        <div class="joel-item no">
+                            <span class="status">❌</span>
+                            <span>Pruebas usabilidad</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Fortalezas -->
+        <div class="slide">
+            <div class="content">
+                <h2>Joel Test - Fortalezas</h2>
+                <div class="strengths">
+                    <h3>✅ Lo que hicimos bien (6 puntos completos)</h3>
+                    <ul>
+                        <li><strong>Control de versiones:</strong> Uso efectivo de Git</li>
+                        <li><strong>Build automatizado:</strong> EAS para generar instalables</li>
+                        <li><strong>Arreglan bugs primero:</strong> Prioridad en resolución de problemas</li>
+                        <li><strong>Cronograma actualizado:</strong> Product backlog y sprints definidos</li>
+                        <li><strong>Especificaciones:</strong> Manual de usuario + código JavaDoc</li>
+                        <li><strong>Mejores herramientas:</strong> Uso de las mejores herramientas a nuestra disposición</li>
+                    </ul>
+                </div>
+                
+                <div style="background: #e8f5e8; padding: 20px; border-radius: 12px; margin-top: 20px;">
+                    <p style="text-align: center; font-style: italic; color: #2d5a3d;">
+                        "Tuvimos bases sólidas en herramientas técnicas y gestión ágil básica"
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Debilidades -->
+        <div class="slide">
+            <div class="content">
+                <h2>Joel Test - Debilidades y Puntos Parciales</h2>
+                
+                <div style="background: #fff3cd; padding: 30px; border-radius: 15px; margin: 20px 0; border-left: 5px solid #f39c12; box-shadow: 0 8px 16px rgba(0,0,0,0.1);">
+                    <h3 style="color: #856404;">⚠️ Punto Parcial (0.5 puntos)</h3>
+                    <ul>
+                        <li><strong>Condiciones de trabajo (0.5):</strong> Universidad ruidosa afectó productividad</li>
+                    </ul>
+                </div>
+                
+                <div class="weaknesses">
+                    <h3>❌ Áreas completamente faltantes (5 puntos perdidos)</h3>
+                    <ul>
+                        <li><strong>Builds diarios:</strong> Solo al final de cada sprint</li>
+                        <li><strong>Base de datos bugs:</strong> Jira implementado muy tarde</li>
+                        <li><strong>Testers dedicados:</strong> Sin roles específicos de testing</li>
+                        <li><strong>Contrataciones:</strong> No aplica - equipo estático</li>
+                        <li><strong>Pruebas de usabilidad:</strong> Sin proceso formal de UX testing</li>
+                    </ul>
+                </div>
+                
+                <div style="background: #ffeaea; padding: 20px; border-radius: 12px; margin-top: 20px;">
+                    <p style="text-align: center; font-style: italic; color: #8b2635;">
+                        "El conteo final: 6 puntos completos + 0.5 punto parcial = 6.5/12"
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: CMMI Nivel -->
+        <div class="slide">
+            <div class="content">
+                <h2>CMMI Data Management</h2>
+                <div class="cmmi-level">
+                    <h3>Nivel Actual</h3>
+                    <div class="level-text">Nivel 1-2</div>
+                    <p>Entre Inicial y Gestionado</p>
+                </div>
+                
+                <div class="two-column">
+                    <div>
+                        <h3>🎯 Nivel 1 (Alcanzado)</h3>
+                        <ul style="font-size: 0.9em;">
+                            <li>Procesos ad-hoc pero funcionales</li>
+                            <li>Datos locales SQLite efectivos</li>
+                            <li>Formato JSON estandarizado</li>
+                            <li>Funcionalidad básica completa</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3>🔄 Nivel 2 (Parcial)</h3>
+                        <ul style="font-size: 0.9em;">
+                            <li>Algunos procesos documentados</li>
+                            <li>Falta gestión centralizada</li>
+                            <li>Sin políticas de backup automático</li>
+                            <li>Sincronización limitada</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: CMMI - Elementos Formales -->
+        <div class="slide">
+            <div class="content">
+                <h2>CMMI - Arquitectura de Datos</h2>
+                
+                <div class="strengths">
+                    <h3>✅ Elementos Formales Implementados</h3>
+                    <ul>
+                        <li><strong>Diagramas ER:</strong> Estructura de datos documentada</li>
+                        <li><strong>Esquemas SQLite:</strong> Nomenclatura estandarizada</li>
+                        <li><strong>Validación JSON:</strong> Formatos especificados con cliente</li>
+                        <li><strong>Export/Import:</strong> Funcionalidad entre dispositivos</li>
+                        <li><strong>Trazabilidad:</strong> ID de dispositivo por respuesta</li>
+                    </ul>
+                </div>
+                
+                <div class="weaknesses">
+                    <h3>❌ Elementos Faltantes</h3>
+                    <ul>
+                        <li><strong>Gestión de metadatos:</strong> Sin catálogo centralizado</li>
+                        <li><strong>Backup automático:</strong> Solo almacenamiento local</li>
+                        <li><strong>Políticas organizacionales:</strong> Procesos no formalizados</li>
+                        <li><strong>Sincronización robusta:</strong> Conflictos sin resolver</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Lecciones Aprendidas -->
+        <div class="slide">
+            <div class="content">
+                <h2>Lecciones Aprendidas</h2>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #dc3545;">🔍 Problemas Identificados</h3>
+                    <ul>
+                        <li><strong>Timing:</strong> Jira implementado demasiado tarde en el proyecto</li>
+                        <li><strong>Comunicación:</strong> Bugs reportados informalmente crearon ineficiencias</li>
+                        <li><strong>Integración:</strong> Falta de builds/pruebas continuas</li>
+                    </ul>
+                </div>
+                
+                <div class="recommendations">
+                    <h3>💡 Recomendaciones para Futuros Proyectos</h3>
+                    <ul>
+                        <li><strong>Sprint 1:</strong> Establecer herramientas de gestión desde el inicio</li>
+                        <li><strong>CI/CD:</strong> Implementar integración continua temprana</li>
+                        <li><strong>Testing formal:</strong> Definir roles y procesos de pruebas</li>
+                        <li><strong>Comunicación:</strong> Canales formales para reporte de incidencias</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Conclusiones -->
+        <div class="slide">
+            <div class="content">
+                <h2>Conclusiones</h2>
+                
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h3 style="color: #667eea;">Reflexión Final</h3>
+                    <p style="font-size: 1.3em; line-height: 1.6; color: #444;">
+                        <strong>FormulApp</strong> demostró que tener buenas prácticas técnicas 
+                        no es suficiente sin procesos organizacionales sólidos
+                    </p>
+                </div>
+                
+                <div class="two-column">
+                    <div style="background: #e8f5e8; padding: 20px; border-radius: 12px;">
+                        <h3 style="color: #2d5a3d;">🎯 Logros</h3>
+                        <ul style="font-size: 0.95em;">
+                            <li>Aplicación funcional completa</li>
+                            <li>Buenas prácticas técnicas básicas</li>
+                            <li>Trabajo en equipo efectivo</li>
+                            <li>Documentación técnica sólida</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="background: #fff3cd; padding: 20px; border-radius: 12px;">
+                        <h3 style="color: #856404;">🚀 Próximos Pasos</h3>
+                        <ul style="font-size: 0.95em;">
+                            <li>Procesos formales desde el inicio</li>
+                            <li>Herramientas integradas temprano</li>
+                            <li>Testing y QA dedicados</li>
+                            <li>Arquitectura de datos robusta</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; font-style: italic; color: #666;">
+                    "La experiencia nos enseñó que la metodología y los procesos organizacionales son tan importantes como la tecnología"
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+        }
+
+        function changeSlide(direction) {
+            if (direction === 1 && currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            } else if (direction === -1 && currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>
